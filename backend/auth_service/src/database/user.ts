@@ -70,6 +70,8 @@ export class UserDbManager {
         name: true,
         surname: true,
         role: true,
+        email: true,
+        phoneNumber: true,
       },
     });
   };

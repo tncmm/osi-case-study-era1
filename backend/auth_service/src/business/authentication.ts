@@ -78,7 +78,7 @@ import {
       phoneNumber,
       password,
       email,
-    }: UserRegisterParams): Promise<Token> {
+    }: UserRegisterParams): Promise<Object> {
       const user = await new UserDbManager().create({
         name,
         surname,
@@ -86,10 +86,20 @@ import {
         password,
         email,
       });
-  
-      return await generateJwtToken({
+      const token = await generateJwtToken({
         userId: user.id,
+        tokenDurationInMinutes: 10,
       });
+      const data = {
+        userId: user.id,
+        email: user.email,
+        phone: user.phoneNumber,
+        name: user.name,
+        surname: user.surname,
+        token: token
+  
+      }
+      return await data;
     }
   
   
