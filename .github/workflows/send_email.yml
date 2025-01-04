@@ -16,12 +16,11 @@ jobs:
     - name: Send email
       uses: dawidd6/action-send-mail@v3
       with:
-        
+        debug: true
         server_address: smtp.mail.me.com
         server_port: 587
         username: tunc_mustafa@icloud.com
         password: ${{ secrets.ICLOUD_APP_PASSWORD }}
-        # Email content
         subject: "New Commit Notification"
         body: |
           A new commit has been pushed to the repository.
