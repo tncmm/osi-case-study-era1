@@ -1,0 +1,33 @@
+name: Send Email on Commit
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Send email
+      uses: dawidd6/action-send-mail@v3
+      with:
+        
+        server_address: smtp.mail.me.com
+        server_port: 587
+        username: tunc_mustafa@icloud.com
+        password: ${{ secrets.ICLOUD_APP_PASSWORD }}
+        # Email content
+        subject: "New Commit Notification"
+        body: |
+          A new commit has been pushed to the repository.
+          Repository URL: https://github.com/tncmm/osi-case-study-era1
+          Commit: ${{ github.event.head_commit.id }}
+          Commit Message: ${{ github.event.head_commit.message }}
+        to: ecrin@osicrew.com
+        cc: oguzhan@osicrew.com, software@osicrew.com
+        from: tunc_mustafa@icloud.com
