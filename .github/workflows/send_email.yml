@@ -3,7 +3,7 @@ name: Send Email on Commit
 on:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
   send-email:
@@ -30,5 +30,5 @@ jobs:
             Commit: ${{ github.event.head_commit.id }}
             Commit Message: ${{ github.event.head_commit.message }}
           to: ecrin@osicrew.com
-          cc: oguzhan@osicrew.com, software@osicrew.com
+          cc: oguzhan@osicrew.com, software@osicrew.com, mustafatunc030600@gmail.com
           from: tunc_mustafa@icloud.com
