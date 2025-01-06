@@ -6,7 +6,7 @@ export interface CreateEventParams {
     description: string;
     date: Date;
     location: string;
-    userId: string;
+    userId: number;
 }
 
 export interface UpdateEventParams {
@@ -19,13 +19,13 @@ export interface UpdateEventParams {
 
 export interface AddCommentParams {
     eventId: string;
-    userId: string;
+    userId: number;
     content: string;
 }
 
 export interface AddParticipantParams {
     eventId: string;
-    userId: string;
+    userId: number;
 }
 
 export default class EventManager {

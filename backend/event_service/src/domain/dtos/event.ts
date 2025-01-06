@@ -3,7 +3,7 @@ export interface CreateEventDTO {
     description: string;
     date: Date;
     location: string;
-    userId: string;
+    userId: number;
 }
 
 export interface UpdateEventDTO {
@@ -16,11 +16,11 @@ export interface UpdateEventDTO {
 
 export interface AddCommentDTO {
     eventId: string;
-    userId: string;
+    userId: number;
     content: string;
 }
 
 export interface AddParticipantDTO {
     eventId: string;
-    userId: string;
+    userId: number;
 } 

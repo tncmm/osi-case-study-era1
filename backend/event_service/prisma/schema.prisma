@@ -13,7 +13,7 @@ model Event {
   description  String
   date        DateTime
   location    String
-  userId      String
+  userId      Int
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   comments    Comment[]
@@ -23,7 +23,7 @@ model Event {
 model Comment {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   content   String
-  userId    String
+  userId    Int
   eventId   String   @db.ObjectId
   event     Event    @relation(fields: [eventId], references: [id])
   createdAt DateTime @default(now())
@@ -32,7 +32,7 @@ model Comment {
 
 model Participant {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String
+  userId    Int
   eventId   String   @db.ObjectId
   event     Event    @relation(fields: [eventId], references: [id])
   createdAt DateTime @default(now())
