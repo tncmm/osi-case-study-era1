@@ -21,6 +21,6 @@ export class OsiCaseStudyError extends Error {
       this.businessErrorCode = businessErrorCode;
     }
 
-    (Error as any).captureStackTrace?.(this, this.constructor);
+    Error.captureStackTrace(this, this.constructor);
 }
 }

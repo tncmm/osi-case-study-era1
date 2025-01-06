@@ -1,14 +1,18 @@
 import express from 'express';
-import cors from 'cors';
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
+require('express-async-errors');
+import { config } from './config/config';
+import { setRoutes } from './startup/routes';
 
 
-const PORT = process.env.PORT || 3001;
+const app: express.Application = express();
+const port: number = config.port;
 
-app.listen(PORT, () => {
-  console.log(`Auth service running on port ${PORT}`);
-}); 
+setRoutes(app);
+
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(port, () => console.log(`Listening on port ${port}`));
+}
+
+
+
+export default app;
