@@ -9,6 +9,7 @@ import {
   Box,
   Alert,
   Grid,
+  Snackbar,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { register } from '../store/slices/authSlice';
@@ -17,6 +18,7 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.auth);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -57,13 +59,26 @@ const Register = () => {
     const { confirmPassword, ...registerData } = formData;
     try {
       await dispatch(register(registerData)).unwrap();
-      navigate('/events');
+      setShowSuccess(true);
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (err) {
+      // Error is already handled by the auth slice
     }
   };
 
   return (
     <Container maxWidth="sm">
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={2000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert severity="success" sx={{ width: '100%' }}>
+          Registration successful! Redirecting to login...
+        </Alert>
+      </Snackbar>
       <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
         <Typography component="h1" variant="h5" align="center" gutterBottom>
           Register
