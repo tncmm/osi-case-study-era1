@@ -15,7 +15,6 @@ const theme = createTheme({
   },
 });
 
-
 import Layout from './components/Layout';
 import PrivateRoute from './components/PrivateRoute';
 import Login from './pages/Login';
@@ -23,6 +22,7 @@ import Register from './pages/Register';
 import EventList from './pages/EventList';
 import EventDetails from './pages/EventDetails';
 import CreateEvent from './pages/CreateEvent';
+import EditEvent from './pages/EditEvent';
 import Profile from './pages/Profile';
 
 function App() {
@@ -39,7 +39,9 @@ function App() {
               
               {/* Protected Routes */}
               <Route path="events" element={<PrivateRoute><EventList /></PrivateRoute>} />
+              <Route path="events/create" element={<PrivateRoute><CreateEvent /></PrivateRoute>} />
               <Route path="events/:id" element={<PrivateRoute><EventDetails /></PrivateRoute>} />
+              <Route path="events/:id/edit" element={<PrivateRoute><EditEvent /></PrivateRoute>} />
               <Route path="events/create" element={<PrivateRoute><CreateEvent /></PrivateRoute>} />
               <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             </Route>

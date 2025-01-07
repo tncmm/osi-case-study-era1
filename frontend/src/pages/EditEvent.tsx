@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -8,15 +8,17 @@ import {
   Typography,
   Box,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { createEvent } from '../store/slices/eventSlice';
+import { fetchEvent, updateEvent } from '../store/slices/eventSlice';
 
-const CreateEvent = () => {
+const EditEvent = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state) => state.events);
+  const { currentEvent: event, loading, error } = useAppSelector((state) => state.events);
   const { user } = useAppSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
@@ -25,6 +27,23 @@ const CreateEvent = () => {
     date: new Date(),
     location: '',
   });
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchEvent(id));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (event) {
+      setFormData({
+        title: event.title,
+        description: event.description,
+        date: new Date(event.date),
+        location: event.location,
+      });
+    }
+  }, [event]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,28 +64,50 @@ const CreateEvent = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user){
-        console.log("User not found");
-        return;
-    } 
+    if (!user || !id) return;
 
     try {
-      const eventData = {
-        ...formData,
-        userId: user.userId
-        
-      };
-      await dispatch(createEvent(eventData)).unwrap();
-      navigate('/events');
+      await dispatch(updateEvent({ id, eventData: formData })).unwrap();
+      navigate(`/events/${id}`);
     } catch (err) {
+      // Error is handled by the reducer
     }
   };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!event) {
+    return (
+      <Container>
+        <Alert severity="error" sx={{ mt: 2 }}>
+          Event not found
+        </Alert>
+      </Container>
+    );
+  }
+
+  // Check if the current user is the owner
+  if (user?.userId !== event.userId) {
+    return (
+      <Container>
+        <Alert severity="error" sx={{ mt: 2 }}>
+          You don't have permission to edit this event
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
         <Typography component="h1" variant="h4" align="center" gutterBottom>
-          Create New Event
+          Edit Event
         </Typography>
 
         {error && (
@@ -83,7 +124,6 @@ const CreateEvent = () => {
             id="title"
             label="Event Title"
             name="title"
-            autoFocus
             value={formData.title}
             onChange={handleChange}
           />
@@ -130,14 +170,13 @@ const CreateEvent = () => {
               fullWidth
               variant="contained"
               disabled={loading}
-              onClick={handleSubmit}
             >
-              {loading ? 'Creating...' : 'Create Event'}
+              {loading ? 'Saving...' : 'Save Changes'}
             </Button>
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => navigate('/events')}
+              onClick={() => navigate(`/events/${id}`)}
             >
               Cancel
             </Button>
@@ -148,4 +187,4 @@ const CreateEvent = () => {
   );
 };
 
-export default CreateEvent; 
+export default EditEvent; 

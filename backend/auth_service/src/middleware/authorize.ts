@@ -11,7 +11,6 @@ export function authorize(allowedRoles?: UserRole[]) {
       throw new Unauthorized('user-not-found');
     }
 
-    // Check if the user's role is allowed
     if (
       allowedRoles &&
       allowedRoles.length > 0 &&

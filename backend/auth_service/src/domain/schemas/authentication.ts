@@ -6,8 +6,6 @@ export const RegisterSchema = Joi.object({
     name: Joi.string().max(50).min(2).required(),
     surname: Joi.string().max(50).min(2).required(),
     email: Joi.string()
-
-
 });
 
 export const PhoneLoginSchema = Joi.object({
@@ -23,4 +21,11 @@ export const EmailLoginSchema = Joi.object({
         .min(6)
         .required(),
 });
+
+export const UpdateUserSchema = Joi.object({
+    name: Joi.string().max(50).min(2),
+    surname: Joi.string().max(50).min(2),
+    phoneNumber: Joi.string(),
+    email: Joi.string().email()
+}).min(1);
 

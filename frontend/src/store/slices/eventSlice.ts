@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { eventService } from '../../services/api';
-import { Event, CreateEventData } from '../../types';
+import { Event, CreateEventData, UpdateEventData } from '../../types';
 
 interface EventState {
   events: Event[];
@@ -40,7 +40,8 @@ export const createEvent = createAsyncThunk(
 export const updateEvent = createAsyncThunk(
   'events/update',
   async ({ id, eventData }: { id: string; eventData: Partial<CreateEventData> }) => {
-    return await eventService.updateEvent(id, eventData);
+    const updateData = { id, ...eventData } as UpdateEventData;
+    return await eventService.updateEvent(id, updateData);
   }
 );
 
@@ -63,6 +64,16 @@ export const addParticipant = createAsyncThunk(
   'events/addParticipant',
   async ({ eventId, userId }: { eventId: string; userId: number }) => {
     return await eventService.addParticipant(eventId, userId);
+  }
+);
+
+export const cancelParticipation = createAsyncThunk(
+  'events/cancelParticipation',
+  async (eventId: string, { getState }) => {
+    const state = getState() as any;
+    const userId = state.auth.user.userId;
+    await eventService.cancelParticipation(eventId);
+    return { eventId, userId };
   }
 );
 
@@ -120,6 +131,13 @@ const eventSlice = createSlice({
       .addCase(addParticipant.fulfilled, (state, action) => {
         if (state.currentEvent) {
           state.currentEvent.participants = [...(state.currentEvent.participants || []), action.payload];
+        }
+      })
+      .addCase(cancelParticipation.fulfilled, (state, action) => {
+        if (state.currentEvent && state.currentEvent.participants) {
+          state.currentEvent.participants = state.currentEvent.participants.filter(
+            p => p.userId !== action.payload.userId
+          );
         }
       });
   },

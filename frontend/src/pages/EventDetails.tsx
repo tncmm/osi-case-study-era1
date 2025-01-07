@@ -6,23 +6,15 @@ import {
   Typography,
   Box,
   Button,
-  Divider,
   TextField,
-  CircularProgress,
   Alert,
-  List,
-  ListItem,
-  ListItemText,
+  CircularProgress,
+  Grid,
   Card,
   CardContent,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import {
-  fetchEvent,
-  addComment,
-  addParticipant,
-  deleteEvent,
-} from '../store/slices/eventSlice';
+import { fetchEvent, addComment, addParticipant, cancelParticipation, deleteEvent } from '../store/slices/eventSlice';
 
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,6 +29,67 @@ const EventDetails = () => {
       dispatch(fetchEvent(id));
     }
   }, [dispatch, id]);
+
+  const handleAddComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !comment.trim()) return;
+
+    try {
+      await dispatch(
+        addComment({
+          eventId: event!.id,
+          content: comment,
+          userId: user.userId
+        })
+      ).unwrap();
+      setComment('');
+    } catch (err) {
+      // Error is handled by the reducer
+    }
+  };
+
+  const handleParticipate = async () => {
+    if (!user || !event) return;
+
+    try {
+      await dispatch(
+        addParticipant({
+          eventId: event.id,
+          userId: user.userId
+        })
+      ).unwrap();
+    } catch (err) {
+      // Error is handled by the reducer
+    }
+  };
+
+  const handleCancelParticipation = async () => {
+    if (!user || !event) return;
+
+    try {
+      await dispatch(cancelParticipation(event.id)).unwrap();
+    } catch (err) {
+      // Error is handled by the reducer
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!event || !window.confirm('Are you sure you want to delete this event?')) return;
+
+    try {
+      await dispatch(deleteEvent(event.id)).unwrap();
+      navigate('/events');
+    } catch (err) {
+      // Error is handled by the reducer
+    }
+  };
+
+  const isParticipant = event?.participants?.some(
+    (p) => p.userId === user?.userId
+  );
+
+  const isOwner = user?.userId === event?.userId;
+  const participantCount = event?.participants?.length || 0;
 
   if (loading) {
     return (
@@ -66,157 +119,110 @@ const EventDetails = () => {
     );
   }
 
-  const handleAddComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !comment.trim()) return;
-
-    try {
-      await dispatch(
-        addComment({
-          eventId: event.id,
-          content: comment,
-          userId: user.userId
-        })
-      ).unwrap();
-      setComment('');
-    } catch (err) {
-    }
-  };
-
-  const handleParticipate = async () => {
-    if (!user) return;
-
-    try {
-      await dispatch(
-        addParticipant({
-          eventId: event.id,
-          userId: user.userId,
-        })
-      ).unwrap();
-    } catch (err) {
-    }
-  };
-
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this event?')) {
-      try {
-        await dispatch(deleteEvent(event.id)).unwrap();
-        navigate('/events');
-      } catch (err) {
-      }
-    }
-  };
-
-  const isOwner = user?.userId === event.userId;
-  const isParticipant = event.participants?.includes(user?.userId || 0);
-
   return (
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h4" component="h1">
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h4" component="h1" gutterBottom>
             {event.title}
           </Typography>
           {isOwner && (
             <Box>
               <Button
-                color="primary"
                 variant="contained"
+                color="primary"
                 onClick={() => navigate(`/events/${event.id}/edit`)}
                 sx={{ mr: 1 }}
               >
                 Edit
               </Button>
-              <Button color="error" variant="contained" onClick={handleDelete}>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleDelete}
+              >
                 Delete
               </Button>
             </Box>
           )}
         </Box>
-
+        <Typography color="textSecondary" gutterBottom>
+          {new Date(event.date).toLocaleDateString()}
+        </Typography>
         <Typography variant="body1" paragraph>
           {event.description}
         </Typography>
+        <Typography variant="body2" color="textSecondary" paragraph>
+          Location: {event.location}
+        </Typography>
+        <Typography variant="body2" color="textSecondary" paragraph>
+          Participants: {participantCount}
+        </Typography>
 
-        <Box sx={{ my: 2 }}>
-          <Typography variant="subtitle1" color="text.secondary">
-            Date: {new Date(event.date).toLocaleString()}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            Location: {event.location}
-          </Typography>
-        </Box>
+        {user && !isOwner && (
+          <Box sx={{ mt: 2, mb: 4 }}>
+            {!isParticipant ? (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleParticipate}
+                disabled={loading}
+              >
+                Participate in Event
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleCancelParticipation}
+                disabled={loading}
+              >
+                Cancel Participation
+              </Button>
+            )}
+          </Box>
+        )}
 
-        <Divider sx={{ my: 3 }} />
+        <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+          Comments
+        </Typography>
 
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Participants
-          </Typography>
-          {!isParticipant && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleParticipate}
-              sx={{ mb: 2 }}
-            >
-              Join Event
-            </Button>
-          )}
-          <List>
-            {event.participants?.map((participantId) => (
-              <ListItem key={participantId}>
-                <ListItemText primary={`Participant ${participantId}`} />
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-
-        <Divider sx={{ my: 3 }} />
-
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Comments
-          </Typography>
-          <Box component="form" onSubmit={handleAddComment} sx={{ mb: 3 }}>
+        {user && (
+          <Box component="form" onSubmit={handleAddComment} sx={{ mb: 4 }}>
             <TextField
               fullWidth
               multiline
-              rows={2}
+              rows={3}
+              variant="outlined"
               placeholder="Add a comment..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              sx={{ mb: 1 }}
+              sx={{ mb: 2 }}
             />
             <Button
               type="submit"
               variant="contained"
-              disabled={!comment.trim()}
+              disabled={!comment.trim() || loading}
             >
               Add Comment
             </Button>
           </Box>
+        )}
 
-          <List>
-            {event.comments?.map((comment) => (
-              <ListItem key={comment.id} disablePadding>
-                <Card sx={{ width: '100%', mb: 1 }}>
-                  <CardContent>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      User {comment.userId}
-                    </Typography>
-                    <Typography variant="body1">
-                      {comment.content}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {new Date(comment.createdAt).toLocaleString()}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
+        <Grid container spacing={2}>
+          {event.comments?.map((comment) => (
+            <Grid item xs={12} key={comment.id}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="body1">{comment.content}</Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    {new Date(comment.createdAt).toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </Paper>
     </Container>
   );

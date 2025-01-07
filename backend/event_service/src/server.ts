@@ -5,9 +5,9 @@ import { setRoutes } from './startup/routes';
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ["https://osi-case-study-era1.onrender.com", "http://localhost:5173"],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'x-auth-token'],
   credentials: true
 }));
 

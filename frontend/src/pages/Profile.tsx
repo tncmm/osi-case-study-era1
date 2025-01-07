@@ -9,12 +9,13 @@ import {
   Alert,
   Grid,
 } from '@mui/material';
-import { useAppSelector } from '../store/hooks';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { updateProfile } from '../store/slices/authSlice';
 
 const Profile = () => {
-  const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const { user, loading, error } = useAppSelector((state) => state.auth);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -34,12 +35,23 @@ const Profile = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(false);
-    setError(null);
+
+    // Only include fields that have been changed
+    const updates: { [key: string]: string } = {};
+    if (formData.name !== user?.name) updates.name = formData.name;
+    if (formData.surname !== user?.surname) updates.surname = formData.surname;
+    if (formData.email !== user?.email) updates.email = formData.email;
+    if (formData.phoneNumber !== user?.phone) updates.phoneNumber = formData.phoneNumber;
+
+    if (Object.keys(updates).length === 0) {
+      return;
+    }
 
     try {
+      await dispatch(updateProfile(updates)).unwrap();
       setSuccess(true);
     } catch (err) {
-      setError('Failed to update profile');
+      // Error is handled by the reducer
     }
   };
 
@@ -76,7 +88,6 @@ const Profile = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
-                required
                 fullWidth
                 id="name"
                 label="First Name"
@@ -87,7 +98,6 @@ const Profile = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                required
                 fullWidth
                 id="surname"
                 label="Last Name"
@@ -98,7 +108,6 @@ const Profile = () => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                required
                 fullWidth
                 id="email"
                 label="Email Address"
@@ -110,7 +119,6 @@ const Profile = () => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                required
                 fullWidth
                 id="phoneNumber"
                 label="Phone Number"
@@ -126,8 +134,9 @@ const Profile = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3 }}
+            disabled={loading}
           >
-            Update Profile
+            {loading ? 'Updating...' : 'Update Profile'}
           </Button>
         </Box>
       </Paper>

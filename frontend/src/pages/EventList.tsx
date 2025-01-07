@@ -100,15 +100,8 @@ const EventList = () => {
                 >
                   View Details
                 </Button>
-                {user && user.userId === event.userId && (
-                  <Button
-                    size="small"
-                    color="secondary"
-                    onClick={() => navigate(`/events/${event.id}/edit`)}
-                  >
-                    Edit
-                  </Button>
-                )}
+                
+                
               </CardActions>
             </Card>
           </Grid>

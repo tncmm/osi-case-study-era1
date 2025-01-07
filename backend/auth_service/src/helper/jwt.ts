@@ -15,7 +15,6 @@ export function verifyJwtToken(token: string | undefined): UserTokenPayload {
   if (!token) {
     throw new Unauthorized('token-not-provided');
   }
-  console.log(config.jwt_private_key);
 
   if (!config.jwt_private_key) {
     throw new NotFound('jwt-key-not-found');

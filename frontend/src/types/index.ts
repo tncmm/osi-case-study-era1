@@ -14,8 +14,15 @@ export interface Event {
   date: string;
   location: string;
   userId: number;
-  participants?: number[];
+  participants?: Participant[];
   comments?: Comment[];
+}
+
+export interface Participant {
+  id: string;
+  eventId: string;
+  userId: number;
+  createdAt: string;
 }
 
 export interface Comment {
@@ -39,10 +46,22 @@ export interface RegisterCredentials {
   password: string;
 }
 
+export interface UpdateUserData {
+  name?: string;
+  surname?: string;
+  email?: string;
+  phoneNumber?: string;
+}
+
 export interface CreateEventData {
+    
   title: string;
   description: string;
   date: Date;
   location: string;
   userId: number;
+}
+
+export interface UpdateEventData extends CreateEventData {
+  id: string;
 } 

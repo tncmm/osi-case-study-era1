@@ -1,4 +1,3 @@
-import { UserRole } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
 import { UserTokenPayload } from '../domain/dtos/token';
 import { verifyJwtToken } from '../helper/jwt';
@@ -14,15 +13,17 @@ declare global {
 
 export function jwt(req: Request, res: Response, next: NextFunction) {
   const token = req.header('x-auth-token');
-  
+
   const nullUser: UserTokenPayload = {
     userId: 0,
-    role: '' as UserRole,
+    role: '',
     name: '',
     surname: '',
   };
 
   const user = token ? verifyJwtToken(token) : nullUser;
+  console.log(user);
+  
   req.user = user;
   next();
 }
