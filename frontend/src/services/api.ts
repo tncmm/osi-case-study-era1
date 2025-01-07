@@ -31,9 +31,11 @@ const eventApi = axios.create({
 
 // Request interceptors
 authApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers['x-auth-token'] = token;
+  if (!config.url?.includes('/login') && !config.url?.includes('/register')) {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['x-auth-token'] = token;
+    }
   }
   return config;
 });
