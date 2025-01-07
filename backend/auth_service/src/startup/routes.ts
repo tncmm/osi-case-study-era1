@@ -17,8 +17,8 @@ export const setRoutes = (app: express.Application) => {
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true }));
   app.use(response);
-  app.use('/', home);
-  app.use('/authentication/', authentication);
   app.use(jwt);
+  app.use('/', home);
+  app.use('/authentication', authentication);
   app.use(errorMiddleware);
 };
