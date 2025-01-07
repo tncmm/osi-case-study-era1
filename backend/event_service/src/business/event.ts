@@ -6,7 +6,7 @@ export interface CreateEventParams {
     description: string;
     date: Date;
     location: string;
-    userId: string;
+    userId: number;
 }
 
 export interface UpdateEventParams {
@@ -19,13 +19,18 @@ export interface UpdateEventParams {
 
 export interface AddCommentParams {
     eventId: string;
-    userId: string;
+    userId: number;
     content: string;
 }
 
 export interface AddParticipantParams {
     eventId: string;
-    userId: string;
+    userId: number;
+}
+
+export interface RemoveParticipantParams {
+    eventId: string;
+    userId: number;
 }
 
 export default class EventManager {
@@ -78,7 +83,11 @@ export default class EventManager {
     }
 
     async getAllEvents() {
-        return await new EventDbManager().findAll();
+        const events = await new EventDbManager().findAll();
+        if (!events) {
+           return [];
+        }
+        return events;
     }
 
     async addComment({
@@ -110,6 +119,22 @@ export default class EventManager {
         }
 
         return await new EventDbManager().addParticipant({
+            eventId,
+            userId
+        });
+    }
+
+    async removeParticipant({
+        eventId,
+        userId
+    }: RemoveParticipantParams) {
+        const event = await new EventDbManager().findById(eventId);
+        
+        if (!event) {
+            throw new NotFound('event-not-found');
+        }
+
+        return await new EventDbManager().removeParticipant({
             eventId,
             userId
         });

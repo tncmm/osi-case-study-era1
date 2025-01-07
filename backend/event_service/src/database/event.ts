@@ -6,7 +6,7 @@ export interface EventCreationParams {
     description: string;
     date: Date;
     location: string;
-    userId: string;
+    userId: number;
 }
 
 export interface EventUpdateParams {
@@ -19,13 +19,18 @@ export interface EventUpdateParams {
 
 export interface CommentCreationParams {
     eventId: string;
-    userId: string;
+    userId: number;
     content: string;
 }
 
 export interface ParticipantCreationParams {
     eventId: string;
-    userId: string;
+    userId: number;
+}
+
+export interface ParticipantRemovalParams {
+    eventId: string;
+    userId: number;
 }
 
 export class EventDbManager {
@@ -106,6 +111,25 @@ export class EventDbManager {
             data: {
                 userId,
                 eventId
+            }
+        });
+    };
+
+    removeParticipant = async ({ eventId, userId }: ParticipantRemovalParams) => {
+        const participant = await db.participant.findFirst({
+            where: {
+                eventId,
+                userId
+            }
+        });
+
+        if (!participant) {
+            throw new BusinessError('user-not-participant');
+        }
+
+        return await db.participant.delete({
+            where: {
+                id: participant.id
             }
         });
     };
