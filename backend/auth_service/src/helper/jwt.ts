@@ -25,6 +25,8 @@ export function verifyJwtToken(token: string | undefined): UserTokenPayload {
 
   try {
     decodedJwt = jwt.verify(token, jwtKey) as UserTokenPayload;
+    decodedJwt.name = decodeURIComponent(decodedJwt.name);
+    decodedJwt.surname = decodeURIComponent(decodedJwt.surname);
   } catch (error: any) {
     throw new Unauthorized(error.message ? error.message : 'invalid-token');
   }
@@ -55,8 +57,8 @@ export async function generateJwtToken({
   const payload: UserTokenPayload = {
     userId: userId,
     role: user.role,
-    name: user.name,
-    surname: user.surname,
+    name: encodeURIComponent(user.name),
+    surname: encodeURIComponent(user.surname),
   };
 
   return jwt.sign(payload, config.jwt_private_key, {
