@@ -31,6 +31,12 @@ export interface Comment {
   userId: number;
   content: string;
   createdAt: string;
+  user?: {
+    id: number;
+    name: string;
+    surname: string;
+    email: string;
+  };
 }
 
 export interface LoginCredentials {

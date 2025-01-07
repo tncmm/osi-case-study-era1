@@ -214,10 +214,15 @@ const EventDetails = () => {
             <Grid item xs={12} key={comment.id}>
               <Card variant="outlined">
                 <CardContent>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                    <Typography variant="subtitle2" color="primary">
+                      {comment.user?.name} {comment.user?.surname}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      {new Date(comment.createdAt).toLocaleString()}
+                    </Typography>
+                  </Box>
                   <Typography variant="body1">{comment.content}</Typography>
-                  <Typography variant="caption" color="textSecondary">
-                    {new Date(comment.createdAt).toLocaleString()}
-                  </Typography>
                 </CardContent>
               </Card>
             </Grid>

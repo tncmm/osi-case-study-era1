@@ -1,5 +1,6 @@
 import db from './db';
 import { BusinessError } from '../domain/error/business_error';
+import { getUserDetails } from '../helper/auth';
 
 export interface EventCreationParams {
     title: string;
@@ -31,6 +32,17 @@ export interface ParticipantCreationParams {
 export interface ParticipantRemovalParams {
     eventId: string;
     userId: number;
+}
+
+async function enrichCommentsWithUserDetails(comments: any[]) {
+    const enrichedComments = await Promise.all(comments.map(async (comment) => {
+        const userDetails = await getUserDetails(comment.userId);
+        return {
+            ...comment,
+            user: userDetails
+        };
+    }));
+    return enrichedComments;
 }
 
 export class EventDbManager {
@@ -67,22 +79,34 @@ export class EventDbManager {
     };
 
     findById = async (id: string) => {
-        return await db.event.findUnique({
+        const event = await db.event.findUnique({
             where: { id },
             include: {
                 comments: true,
                 participants: true
             }
         });
+
+        if (event) {
+            event.comments = await enrichCommentsWithUserDetails(event.comments);
+        }
+
+        return event;
     };
 
     findAll = async () => {
-        return await db.event.findMany({
+        const events = await db.event.findMany({
             include: {
                 comments: true,
                 participants: true
             }
         });
+
+        for (const event of events) {
+            event.comments = await enrichCommentsWithUserDetails(event.comments);
+        }
+
+        return events;
     };
 
     addComment = async ({ eventId, userId, content }: CommentCreationParams) => {
@@ -135,8 +159,18 @@ export class EventDbManager {
     };
 
     delete = async (id: string) => {
-        return await db.event.delete({
-            where: { id }
-        });
+        // First, delete all associated comments and participants
+        await db.$transaction([
+            db.comment.deleteMany({
+                where: { eventId: id }
+            }),
+            db.participant.deleteMany({
+                where: { eventId: id }
+            }),
+            db.event.delete({
+                where: { id }
+            })
+        ]);
+        return true;
     };
 } 

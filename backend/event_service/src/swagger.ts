@@ -79,6 +79,15 @@ const options = {
                   id: { type: 'string', example: '507f1f77bcf86cd799439012' },
                   content: { type: 'string', example: 'Great event!' },
                   userId: { type: 'integer', example: 1 },
+                  user: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'integer', example: 1 },
+                      name: { type: 'string', example: 'John' },
+                      surname: { type: 'string', example: 'Doe' },
+                      email: { type: 'string', example: 'john@example.com' }
+                    }
+                  },
                   createdAt: { type: 'string', format: 'date-time' },
                 },
               },
@@ -114,6 +123,11 @@ const options = {
         },
       },
     },
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
   },
   apis: ['./src/routes/*.ts'], // Path to the API routes
 };
