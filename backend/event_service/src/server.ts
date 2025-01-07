@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import { setRoutes } from './startup/routes';
+import swaggerUi from 'swagger-ui-express';
+import { specs } from './swagger';
 
 const app = express();
 
@@ -10,6 +12,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'x-auth-token'],
   credentials: true
 }));
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 setRoutes(app);
 
