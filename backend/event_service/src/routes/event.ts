@@ -7,6 +7,31 @@ import { CreateEventSchema, UpdateEventSchema, AddCommentSchema, AddParticipantS
 
 const router: express.Router = express.Router();
 
+/**
+ * @swagger
+ * /events/create:
+ *   post:
+ *     summary: Create a new event
+ *     tags: [Events]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateEventRequest'
+ *     responses:
+ *       200:
+ *         description: Event created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 event:
+ *                   $ref: '#/components/schemas/EventResponse'
+ */
 router.post(
     '/create',
     authorize(['USER', 'ADMIN']),
@@ -19,6 +44,37 @@ router.post(
     }
 );
 
+/**
+ * @swagger
+ * /events/{id}:
+ *   put:
+ *     summary: Update an event
+ *     tags: [Events]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateEventRequest'
+ *     responses:
+ *       200:
+ *         description: Event updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 event:
+ *                   $ref: '#/components/schemas/EventResponse'
+ */
 router.put(
     '/:id',
     authorize(['USER', 'ADMIN']),
@@ -32,6 +88,31 @@ router.put(
     }
 );
 
+/**
+ * @swagger
+ * /events/{id}:
+ *   get:
+ *     summary: Get an event by ID
+ *     tags: [Events]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Event details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 event:
+ *                   $ref: '#/components/schemas/EventResponse'
+ */
 router.get(
     '/:id',
     authorize(['USER', 'ADMIN']),
@@ -41,6 +122,27 @@ router.get(
     }
 );
 
+/**
+ * @swagger
+ * /events:
+ *   get:
+ *     summary: Get all events
+ *     tags: [Events]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 events:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/EventResponse'
+ */
 router.get(
     '/',
     authorize(['USER', 'ADMIN']),
@@ -50,6 +152,47 @@ router.get(
     }
 );
 
+/**
+ * @swagger
+ * /events/{id}/comment:
+ *   post:
+ *     summary: Add a comment to an event
+ *     tags: [Events]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AddCommentRequest'
+ *     responses:
+ *       200:
+ *         description: Comment added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 comment:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     content:
+ *                       type: string
+ *                     userId:
+ *                       type: integer
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ */
 router.post(
     '/:id/comment',
     authorize(['USER', 'ADMIN']),
@@ -63,6 +206,45 @@ router.post(
     }
 );
 
+/**
+ * @swagger
+ * /events/{id}/participant:
+ *   post:
+ *     summary: Add a participant to an event
+ *     tags: [Events]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AddParticipantRequest'
+ *     responses:
+ *       200:
+ *         description: Participant added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 participant:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     userId:
+ *                       type: integer
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ */
 router.post(
     '/:id/participant',
     authorize(['USER', 'ADMIN']),
@@ -76,6 +258,31 @@ router.post(
     }
 );
 
+/**
+ * @swagger
+ * /events/{id}/participant:
+ *   delete:
+ *     summary: Remove current user from event participants
+ *     tags: [Events]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Participation cancelled successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 router.delete(
     '/:id/participant',
     authorize(['USER', 'ADMIN']),
@@ -88,6 +295,31 @@ router.delete(
     }
 );
 
+/**
+ * @swagger
+ * /events/{id}:
+ *   delete:
+ *     summary: Delete an event
+ *     tags: [Events]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Event deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 router.delete(
     '/:id',
     authorize(['USER', 'ADMIN']),

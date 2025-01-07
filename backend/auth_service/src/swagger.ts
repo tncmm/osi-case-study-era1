@@ -58,13 +58,21 @@ const options = {
         UserResponse: {
           type: 'object',
           properties: {
+            userId: { type: 'integer', example: 1 },
+            email: { type: 'string', example: 'john@example.com' },
+            phone: { type: 'string', example: '+1234567890' },
+            name: { type: 'string', example: 'John' },
+            surname: { type: 'string', example: 'Doe' },
+            token: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
+          },
+        },
+        UserDetailsResponse: {
+          type: 'object',
+          properties: {
             id: { type: 'integer', example: 1 },
             name: { type: 'string', example: 'John' },
             surname: { type: 'string', example: 'Doe' },
             email: { type: 'string', example: 'john@example.com' },
-            phoneNumber: { type: 'string', example: '+1234567890' },
-            role: { type: 'string', enum: ['USER', 'ADMIN'], example: 'USER' },
-            token: { type: 'string' },
           },
         },
         Error: {

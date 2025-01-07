@@ -59,7 +59,6 @@ const Register = () => {
       await dispatch(register(registerData)).unwrap();
       navigate('/events');
     } catch (err) {
-      // Error is handled by the reducer
     }
   };
 
